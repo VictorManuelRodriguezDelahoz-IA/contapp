@@ -1,18 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from datetime import timedelta
+from models import TaxRequest, TaxResponse, ParafiscalesDetail
 
-from backend.models import (
-    TaxRequest, TaxResponse, ParafiscalesDetail,
-    LoginRequest, LoginResponse
-)
-from backend.database import get_db, init_db
-from backend.auth import verify_access_code, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
-from backend.financial_routes import router as financial_router
-
-# Initialize FastAPI app
-app = FastAPI(title="Gestión Financiera Personal", version="2.0.0")
+app = FastAPI(title="Colombian Tax Calculator API", version="1.0.0")
 
 # CORS configuration
 app.add_middleware(
@@ -22,41 +12,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize database on startup
-@app.on_event("startup")
-def startup_event():
-    init_db()
-
-# Include financial routes
-app.include_router(financial_router)
-
-# ============ AUTHENTICATION ============
-@app.post("/api/auth/login", response_model=LoginResponse)
-def login(login_data: LoginRequest, db: Session = Depends(get_db)):
-    """Login with access code"""
-    user = verify_access_code(login_data.access_code, db)
-    
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Código de acceso inválido"
-        )
-    
-    # Create access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires
-    )
-    
-    return LoginResponse(
-        access_token=access_token,
-        user_name=user.name
-    )
-
-
-# ============ TAX CALCULATOR (EXISTING FUNCTIONALITY) ============
 
 # 2025 Colombian Tax Rates
 INCOME_TAX_BRACKETS_2025 = [
@@ -99,6 +54,9 @@ def calculate_income_tax_sas(annual_income: float) -> float:
 
 def calculate_parafiscales(monthly_income: float) -> ParafiscalesDetail:
     """Calculate parafiscales (health, pension, ARL) - monthly basis"""
+    # Parafiscales are calculated on salary income
+    # For simplification, we apply to monthly income
+    
     salud = monthly_income * PARAFISCALES_RATES["salud"]
     pension = monthly_income * PARAFISCALES_RATES["pension"]
     arl = monthly_income * PARAFISCALES_RATES["arl"]
@@ -125,12 +83,10 @@ def calculate_deductions(afc: float, mortgage_interest: float) -> float:
 @app.get("/")
 async def root():
     return {
-        "message": "Gestión Financiera Personal - API",
-        "version": "2.0.0",
+        "message": "Colombian Tax Calculator API - 2025",
+        "version": "1.0.0",
         "endpoints": {
-            "auth": "/api/auth/login (POST)",
-            "calculate_taxes": "/api/calculate (POST)",
-            "financial": "/api/financial/* (requires authentication)"
+            "calculate": "/api/calculate (POST)"
         }
     }
 

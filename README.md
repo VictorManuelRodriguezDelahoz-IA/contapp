@@ -1,45 +1,48 @@
-# Calculadora de Impuestos Colombia 2025
+# Gestión Financiera Personal 2.0
 
-Una aplicación web moderna para calcular impuestos DIAN y parafiscales en Colombia, con tasas actualizadas para 2025.
+Una aplicación web moderna y completa para gestionar tus finanzas personales y calcular impuestos en Colombia.
 
 ## 🚀 Características
 
-- **Sin Login**: Acceso inmediato sin necesidad de registro
-- **Cálculo en Tiempo Real**: Resultados instantáneos al enviar el formulario
-- **Soporte Dual**: Personas Naturales y SAS
-- **Tasas 2025**: Actualizado con las tasas tributarias vigentes
-- **Diseño Moderno**: Interfaz azul/violeta con animaciones suaves
-- **Responsive**: Funciona en desktop, tablet y móvil
+### 💰 Gestión Financiera
+- **Dashboard Interactivo**: Visualiza tus ingresos, gastos y balance en tiempo real
+- **Transacciones**: Registra y categoriza todos tus movimientos financieros
+- **Gráficos de Torta**: Visualiza la distribución de tus gastos por categoría
+- **Filtros Avanzados**: Filtra transacciones por mes y año
+- **14 Categorías Predefinidas**: Desde alimentación hasta inversiones
 
-## 📊 Cálculos Incluidos
-
-### Impuesto de Renta (DIAN)
-- **Persona Natural**: Tarifas progresivas (0%, 19%, 28%, 33%)
+### 🧮 Calculadora de Impuestos Colombia 2025
+- **Personas Naturales**: Tarifas progresivas (0%, 19%, 28%, 33%)
 - **SAS**: Tarifa fija del 35%
+- **Parafiscales**: Salud (12.5%), Pensión (16%), ARL (0.522%)
+- **Deducciones**: AFC (hasta 3,800 UVT), Intereses Hipotecarios (hasta 1,200 UVT)
 
-### Parafiscales
-- **Salud**: 12.5%
-- **Pensión**: 16%
-- **ARL**: 0.522% (riesgo mínimo)
+### 🔐 Autenticación Simple
+- Acceso con código personalizado
+- Sesión persistente
+- Ideal para uso personal
 
-### Deducciones
-- **AFC**: Hasta 3,800 UVT
-- **Intereses Hipotecarios**: Hasta 1,200 UVT
-
-## 🛠️ Tecnologías
-
-- **Backend**: FastAPI (Python)
-- **Frontend**: React + Vite
-- **Estilos**: CSS moderno con gradientes y animaciones
+### 🎨 Diseño Premium
+- Tema oscuro moderno
+- Gradientes vibrantes
+- Animaciones suaves
+- 100% responsive
+- Tipografía Inter
 
 ## 📦 Instalación
+
+### Requisitos
+- Python 3.8+
+- Node.js 18+
 
 ### Backend
 
 ```bash
-cd backend
+# Instalar dependencias
 pip install -r requirements.txt
-uvicorn main:app --reload
+
+# Iniciar servidor
+uvicorn backend.main:app --reload --port 8000
 ```
 
 El backend estará disponible en `http://localhost:8000`
@@ -47,8 +50,13 @@ El backend estará disponible en `http://localhost:8000`
 ### Frontend
 
 ```bash
+# Navegar a la carpeta frontend
 cd frontend
+
+# Instalar dependencias
 npm install
+
+# Iniciar servidor de desarrollo
 npm run dev
 ```
 
@@ -56,82 +64,183 @@ El frontend estará disponible en `http://localhost:5173`
 
 ## 🎯 Uso
 
-1. Inicia el backend (puerto 8000)
-2. Inicia el frontend (puerto 5173)
-3. Abre tu navegador en `http://localhost:5173`
-4. Completa el formulario con tu información financiera
-5. Haz clic en "Calcular Impuestos"
-6. Revisa los resultados en tiempo real
+### 1. Acceder a la Aplicación
+1. Abre tu navegador en `http://localhost:5173`
+2. Ingresa el código de acceso: `FINANZAS2026`
+3. Haz clic en "Ingresar"
 
-## 📝 Campos del Formulario
+### 2. Dashboard
+- Visualiza tus métricas financieras
+- Selecciona mes y año para filtrar
+- Observa gráficos de distribución de gastos
 
-- **Tipo de Persona**: Natural o SAS
-- **Ingresos Mensuales**: Tus ingresos mensuales en COP
-- **Egresos Mensuales**: Tus gastos mensuales (informativo)
-- **Aportes AFC**: Contribuciones anuales a cuentas AFC
-- **Intereses Hipotecarios**: Intereses pagados anualmente
-- **Patrimonio**: Valor total de tus activos
+### 3. Transacciones
+- Haz clic en "Nueva Transacción"
+- Selecciona tipo (Ingreso o Gasto)
+- Completa descripción, monto y categoría
+- Agrega notas opcionales
+- Edita o elimina transacciones existentes
 
-## 🎨 Diseño
+### 4. Calculadora de Impuestos
+- Selecciona tu tipo de persona (Natural o SAS)
+- Ingresa tus datos financieros
+- Haz clic en "Calcular Impuestos"
+- Revisa los resultados detallados
 
-La aplicación utiliza un esquema de colores azul y violeta con:
-- Gradientes modernos
-- Animaciones suaves
-- Tarjetas con efecto hover
-- Diseño responsive
-- Tipografía Inter
+## 🗂️ Estructura del Proyecto
+
+```
+Contaapp/
+├── backend/
+│   ├── main.py              # FastAPI app principal
+│   ├── database.py          # Modelos SQLAlchemy
+│   ├── auth.py              # Autenticación JWT
+│   ├── financial_routes.py  # Rutas financieras
+│   └── models.py            # Modelos Pydantic
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Login.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Transactions.jsx
+│   │   │   ├── TaxCalculator.jsx
+│   │   │   └── Charts.jsx
+│   │   ├── App.jsx
+│   │   └── App.css
+│   └── package.json
+├── finanzas.db              # Base de datos SQLite (se crea automáticamente)
+└── requirements.txt
+```
+
+## 📊 Categorías Predeterminadas
+
+### Ingresos
+- 💼 Salario
+- 💻 Freelance
+- 📈 Inversiones
+- 💵 Otros Ingresos
+
+### Gastos
+- 🍔 Alimentación
+- 🚗 Transporte
+- 🏠 Vivienda
+- 💡 Servicios
+- 🏥 Salud
+- 📚 Educación
+- 🎮 Entretenimiento
+- 👕 Ropa
+- 🏦 Ahorro
+- 💸 Otros Gastos
+
+## 🔧 Tecnologías
+
+### Backend
+- **FastAPI**: Framework web moderno y rápido
+- **SQLAlchemy**: ORM para base de datos
+- **SQLite**: Base de datos local
+- **JWT**: Autenticación con tokens
+- **Pydantic**: Validación de datos
+
+### Frontend
+- **React 19**: Biblioteca UI
+- **React Router**: Navegación
+- **Recharts**: Gráficos interactivos
+- **Axios**: Cliente HTTP
+- **date-fns**: Manejo de fechas
+
+## 🎨 Personalización
+
+### Cambiar Código de Acceso
+
+Edita `backend/database.py` en la función `init_db()`:
+
+```python
+default_user = User(access_code="TU_CODIGO_AQUI", name="Tu Nombre")
+```
+
+### Agregar Categorías
+
+Edita `backend/database.py` en la función `init_db()` y agrega nuevas categorías:
+
+```python
+Category(name="Nueva Categoría", type="gasto", color="#ff0000", icon="🎯")
+```
+
+## 📱 Responsive Design
+
+La aplicación se adapta perfectamente a:
+- 🖥️ Desktop (1920px+)
+- 💻 Laptop (1024px+)
+- 📱 Tablet (768px+)
+- 📱 Móvil (320px+)
+
+## 🔒 Seguridad
+
+- Autenticación con JWT
+- Tokens con expiración de 7 días
+- Rutas protegidas en el backend
+- Validación de datos con Pydantic
+
+> ⚠️ **Nota**: Esta aplicación está diseñada para uso personal local. Para producción, considera implementar medidas de seguridad adicionales.
 
 ## 📄 API Endpoints
 
-### `POST /api/calculate`
+### Autenticación
+- `POST /api/auth/login` - Login con código de acceso
 
-Calcula impuestos y parafiscales.
+### Transacciones
+- `GET /api/financial/transactions` - Listar transacciones
+- `POST /api/financial/transactions` - Crear transacción
+- `PUT /api/financial/transactions/{id}` - Actualizar transacción
+- `DELETE /api/financial/transactions/{id}` - Eliminar transacción
 
-**Request Body:**
-```json
-{
-  "legal_status": "natural",
-  "monthly_income": 5000000,
-  "monthly_expenses": 2000000,
-  "afc_contributions": 10000000,
-  "mortgage_interest": 5000000,
-  "patrimony": 100000000
-}
+### Resúmenes
+- `GET /api/financial/summary` - Resumen financiero
+- `GET /api/financial/summary/monthly` - Resúmenes mensuales
+
+### Categorías
+- `GET /api/financial/categories` - Listar categorías
+
+### Impuestos
+- `POST /api/calculate` - Calcular impuestos
+
+## 🐛 Solución de Problemas
+
+### El backend no inicia
+```bash
+# Verifica que las dependencias estén instaladas
+pip install -r requirements.txt
+
+# Verifica la versión de Python
+python --version  # Debe ser 3.8+
 ```
 
-**Response:**
-```json
-{
-  "annual_income": 60000000,
-  "taxable_income": 45000000,
-  "income_tax": 2850000,
-  "parafiscales": {
-    "salud": 7500000,
-    "pension": 9600000,
-    "arl": 313200,
-    "total": 17413200
-  },
-  "total_tax_burden": 20263200,
-  "net_annual_income": 39736800,
-  "effective_tax_rate": 33.77,
-  "deductions_applied": 15000000
-}
+### El frontend no inicia
+```bash
+# Limpia node_modules y reinstala
+rm -rf node_modules package-lock.json
+npm install
 ```
 
-## 📊 UVT 2025
-
-Unidad de Valor Tributario: **$47,065 COP**
-
-## ⚖️ Disclaimer
-
-Esta calculadora es una herramienta informativa. Para declaraciones oficiales, consulta con un contador certificado.
-
-## 🔧 Desarrollo
-
-- Backend: Python 3.8+
-- Frontend: Node.js 18+
-- Hot reload habilitado en ambos entornos
+### Error de CORS
+Verifica que el backend esté corriendo en el puerto 8000 y el frontend en 5173.
 
 ## 📞 Soporte
 
-Para preguntas o reportar problemas, contacta al equipo de desarrollo.
+Para preguntas o problemas, revisa:
+1. La documentación en este README
+2. El archivo `walkthrough.md` para ejemplos de uso
+3. Los comentarios en el código fuente
+
+## 📝 Licencia
+
+Este proyecto es de uso personal. Siéntete libre de modificarlo según tus necesidades.
+
+## 🎉 Créditos
+
+Desarrollado con ❤️ para gestionar finanzas personales de manera profesional y eficiente.
+
+---
+
+**Versión**: 2.0.0  
+**Última actualización**: Diciembre 2024
