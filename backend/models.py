@@ -77,7 +77,7 @@ class TransactionResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Category models
@@ -89,7 +89,7 @@ class CategoryResponse(BaseModel):
     icon: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Budget models
@@ -110,7 +110,7 @@ class BudgetResponse(BaseModel):
     spent: float = 0
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Savings goal models
@@ -135,7 +135,7 @@ class SavingsGoalResponse(BaseModel):
     progress_percentage: float
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Summary models

@@ -1,6 +1,18 @@
 from pydantic import BaseModel, Field
 from typing import Literal
 
+# Auth models
+class LoginRequest(BaseModel):
+    """Request model for login"""
+    access_code: str = Field(..., description="Access code for authentication")
+
+class LoginResponse(BaseModel):
+    """Response model for login"""
+    access_token: str
+    token_type: str = "bearer"
+    user_name: str
+
+# Tax calculation models
 class TaxRequest(BaseModel):
     """Request model for tax calculation"""
     legal_status: Literal["natural", "sas"] = Field(..., description="Persona Natural o SAS")
