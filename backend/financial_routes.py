@@ -38,13 +38,33 @@ def create_transaction(
     current_user = Depends(get_current_user)
 ):
     """Create a new transaction"""
+    # Debug logging
+    print(f"=== CREATE TRANSACTION DEBUG ===")
+    print(f"Received data: {transaction}")
+    print(f"Date field: {transaction.date}")
+    print(f"Date type: {type(transaction.date)}")
+    
     # Get category
     category = db.query(Category).filter(Category.id == transaction.category_id).first()
     if not category:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     
-    # Use provided date or current date
-    trans_date = transaction.date or datetime.utcnow()
+    # Parse date from string
+    if transaction.date:
+        # Parse ISO date string (YYYY-MM-DD)
+        try:
+            # Handle both 'YYYY-MM-DD' and 'YYYY-MM-DDTHH:MM:SS' formats
+            date_str = transaction.date.split('T')[0]  # Get just the date part
+            trans_date = datetime.strptime(date_str, '%Y-%m-%d')
+            print(f"Parsed date: {trans_date}")
+            print(f"Month: {trans_date.month}, Year: {trans_date.year}")
+        except (ValueError, AttributeError) as e:
+            # If parsing fails, use current date
+            print(f"Date parsing error: {e}, using current date")
+            trans_date = datetime.utcnow()
+    else:
+        print("No date provided, using current date")
+        trans_date = datetime.utcnow()
     
     # Create transaction
     db_transaction = Transaction(
@@ -149,9 +169,16 @@ def update_transaction(
     if transaction.category_id is not None:
         db_transaction.category_id = transaction.category_id
     if transaction.date is not None:
-        db_transaction.date = transaction.date
-        db_transaction.month = transaction.date.month
-        db_transaction.year = transaction.date.year
+        # Parse date string to datetime
+        try:
+            date_str = transaction.date.split('T')[0]  # Get just the date part
+            parsed_date = datetime.strptime(date_str, '%Y-%m-%d')
+            db_transaction.date = parsed_date
+            db_transaction.month = parsed_date.month
+            db_transaction.year = parsed_date.year
+        except (ValueError, AttributeError) as e:
+            print(f"Date parsing error in update: {e}")
+            raise HTTPException(status_code=400, detail="Formato de fecha inválido. Use YYYY-MM-DD")
     if transaction.notes is not None:
         db_transaction.notes = transaction.notes
     

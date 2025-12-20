@@ -48,7 +48,7 @@ class TransactionCreate(BaseModel):
     amount: float
     type: str  # "ingreso" or "gasto"
     category_id: int
-    date: Optional[datetime] = None
+    date: Optional[str] = None  # Accept ISO date string (YYYY-MM-DD)
     notes: Optional[str] = None
 
 
@@ -57,7 +57,7 @@ class TransactionUpdate(BaseModel):
     amount: Optional[float] = None
     type: Optional[str] = None
     category_id: Optional[int] = None
-    date: Optional[datetime] = None
+    date: Optional[str] = None  # Accept ISO date string (YYYY-MM-DD)
     notes: Optional[str] = None
 
 
