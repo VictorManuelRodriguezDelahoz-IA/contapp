@@ -51,5 +51,5 @@ export const summaryApi = {
 // Tax Calculator (no authentication required)
 export const taxApi = {
   calculate: (data: TaxRequest) =>
-    apiClient.post<TaxResponse>('/api/calculate', data),
+    apiClient.post<TaxResponse>('/calculate', data),
 };

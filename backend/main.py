@@ -3,13 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from models import (
+from .models import (
     TaxRequest, TaxResponse, ParafiscalesDetail,
     LoginRequest, LoginResponse
 )
-from database import get_db, init_db
-from auth import verify_access_code, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
-from financial_routes import router as financial_router
+from .database import get_db, init_db
+from .auth import verify_access_code, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from .financial_routes import router as financial_router
 
 # Initialize FastAPI app
 app = FastAPI(title="Gestión Financiera Personal", version="2.0.0")
