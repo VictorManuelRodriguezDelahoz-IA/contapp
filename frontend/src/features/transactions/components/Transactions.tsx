@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Pencil from '@/components/icons/Pencil';
 import Trash2 from '@/components/icons/Trash2';
+import CategoryIcon from '@/components/icons/CategoryIcon';
+import CategorySelect from '@/components/CategorySelect';
 import {
   useTransactions,
   useCategories,
@@ -226,21 +228,14 @@ export default function Transactions() {
               <label htmlFor="category_id" className="block text-sm font-medium mb-2">
                 Categoría
               </label>
-              <select
+              <CategorySelect
                 id="category_id"
+                categories={categories || []}
+                value={watch('category_id') || ''}
                 {...register('category_id', { valueAsNumber: true })}
-                className="w-full px-4 py-3 rounded-lg glass border border-white/10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
-              >
-                <option value="">Selecciona una categoría</option>
-                {categories?.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
-                  </option>
-                ))}
-              </select>
-              {errors.category_id && (
-                <p className="text-red-400 text-sm mt-1">{errors.category_id.message}</p>
-              )}
+                selectedType={transactionType}
+                error={errors.category_id?.message}
+              />
             </div>
 
             {/* Date */}
@@ -312,10 +307,10 @@ export default function Transactions() {
               >
                 <div className="flex items-center gap-4 flex-1">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${transaction.type === 'ingreso' ? 'bg-green-500/20' : 'bg-red-500/20'
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${transaction.type === 'ingreso' ? 'bg-green-500/20' : 'bg-red-500/20'
                       }`}
                   >
-                    {transaction.category_icon}
+                    <CategoryIcon emoji={transaction.category_icon} className="w-6 h-6" />
                   </div>
 
                   <div className="flex-1">

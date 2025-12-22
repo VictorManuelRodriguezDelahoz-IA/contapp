@@ -2,6 +2,7 @@ import { useState } from 'react';
 import TrendingUp from '@/components/icons/TrendingUp';
 import TrendingDown from '@/components/icons/TrendingDown';
 import DollarSign from '@/components/icons/DollarSign';
+import CategoryIcon from '@/components/icons/CategoryIcon';
 import { useSummary } from '@/hooks/useSummary';
 import { formatCurrency } from '@/utils/currency';
 import { MONTHS } from '@/utils/constants';
@@ -148,7 +149,7 @@ export default function Dashboard() {
                 <div key={index}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="flex items-center gap-2">
-                      <span>{cat.category_icon}</span>
+                      <CategoryIcon emoji={cat.category_icon} className="w-5 h-5" />
                       <span className="text-sm">{cat.category_name}</span>
                     </span>
                     <span className="text-sm font-semibold">{formatCurrency(cat.total)}</span>
@@ -176,7 +177,7 @@ export default function Dashboard() {
                 <div key={index}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="flex items-center gap-2">
-                      <span>{cat.category_icon}</span>
+                      <CategoryIcon emoji={cat.category_icon} className="w-5 h-5" />
                       <span className="text-sm">{cat.category_name}</span>
                     </span>
                     <span className="text-sm font-semibold">{formatCurrency(cat.total)}</span>

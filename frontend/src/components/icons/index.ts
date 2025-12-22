@@ -9,3 +9,4 @@ export { default as DollarSign } from './DollarSign.tsx';
 export { default as Pencil } from './Pencil.tsx';
 export { default as Trash2 } from './Trash2.tsx';
 export { default as Info } from './Info.tsx';
+export { default as CategoryIcon } from './CategoryIcon.tsx';
