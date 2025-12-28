@@ -78,9 +78,10 @@ export default function TaxCalculator() {
                     setResults(null); // Clear results when switching tabs
                   }}
                   className={`flex-1 px-4 py-3 rounded-md font-semibold transition-all cursor-pointer ${legalStatus === 'natural'
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-primary/10 shadow-lg'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface'
                     }`}
+                  style={legalStatus === 'natural' ? { color: '#AA73F3' } : {}}
                 >
                   Persona Natural
                 </button>
@@ -102,9 +103,10 @@ export default function TaxCalculator() {
                     setResults(null); // Clear results when switching tabs
                   }}
                   className={`flex-1 px-4 py-3 rounded-md font-semibold transition-all cursor-pointer ${legalStatus === 'sas'
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-primary/10 shadow-lg'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface'
                     }`}
+                  style={legalStatus === 'sas' ? { color: '#AA73F3' } : {}}
                 >
                   SAS
                 </button>
@@ -222,7 +224,10 @@ export default function TaxCalculator() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-6 py-3 bg-primary hover:bg-primary/90 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-white"
+              style={{ backgroundColor: '#AA73F3' }}
+              onMouseEnter={(e) => !isLoading && (e.currentTarget.style.backgroundColor = '#8B4FE8')}
+              onMouseLeave={(e) => !isLoading && (e.currentTarget.style.backgroundColor = '#AA73F3')}
             >
               {isLoading ? 'Calculando...' : 'Calcular Impuestos'}
             </button>

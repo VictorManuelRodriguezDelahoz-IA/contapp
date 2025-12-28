@@ -283,27 +283,113 @@ npm run type-check
 
 ---
 
-## 🎨 Estilos
+## 🎨 Sistema de Diseño
 
-### TailwindCSS
+### Filosofía
+Diseño minimalista inspirado en Apple: interfaces limpias, jerarquía visual clara, transiciones suaves y consistencia en toda la aplicación.
 
-El proyecto usa TailwindCSS para estilos. Configuración en [tailwind.config.js](tailwind.config.js).
+### Paleta de Colores
 
-**Clases personalizadas:**
+**Colores Principales:**
+- **Primary**: `#AA73F3` (Púrpura) - Acciones principales, botones CTA
+- **Secondary**: `#FFFFFE` (Blanco) - Fondos de tarjetas
+- **Tertiary**: `#1C145D` (Azul oscuro) - Textos importantes, contraste fuerte
+
+**Colores de Estado:**
+- **Success**: `#30D158` (Verde) - Éxito, ingresos
+- **Warning**: `#FF9F0A` (Naranja) - Advertencias
+- **Error**: `#FF3B30` (Rojo) - Errores, gastos
+- **Info**: `#007AFF` (Azul) - Información
+
+**Colores de UI:**
 ```css
-/* index.css */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-}
+/* Backgrounds */
+bg-surface: #F5F5F7      /* Fondo principal */
+bg-background-card: #FFF /* Tarjetas */
+
+/* Text */
+text-primary: #1D1D1F    /* Texto principal */
+text-secondary: #86868B  /* Texto secundario */
+text-tertiary: #C6C6C8   /* Texto deshabilitado */
+
+/* Borders */
+border-light: #E5E5EA    /* Bordes sutiles */
+border-default: #D2D2D7  /* Bordes estándar */
 ```
 
-**Gradientes:**
+### Componentes Pre-construidos
+
+**Botones:**
 ```tsx
-<h1 className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-  FinanzasApp
-</h1>
+<button className="btn-primary">Acción Principal</button>
+<button className="btn-secondary">Acción Secundaria</button>
+<button className="btn-ghost">Acción Terciaria</button>
 ```
+
+**Cards:**
+```tsx
+<div className="card">Tarjeta estándar</div>
+<div className="card-hover">Tarjeta con hover</div>
+```
+
+**Inputs:**
+```tsx
+<input className="input" placeholder="Texto..." />
+```
+
+**Badges:**
+```tsx
+<span className="badge-primary">Pro</span>
+<span className="badge-success">Activo</span>
+<span className="badge-warning">Pendiente</span>
+<span className="badge-error">Error</span>
+```
+
+### Tipografía
+```css
+Font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI'
+```
+
+| Clase | Uso |
+|-------|-----|
+| `text-xs` | Notas, metadatos |
+| `text-sm` | Texto secundario, labels |
+| `text-base` | Texto principal |
+| `text-lg` - `text-4xl` | Encabezados (gradual) |
+
+### Animaciones
+
+```tsx
+<div className="animate-fade-in">Aparece suavemente</div>
+<div className="animate-slide-up">Desliza desde abajo</div>
+<div className="animate-scale-in">Escala desde 95% a 100%</div>
+```
+
+### Espaciado
+Sistema basado en grid de **8px**: `p-2` (8px), `p-4` (16px), `p-6` (24px), `p-8` (32px)
+
+### Border Radius
+- `rounded-lg` (12px) - Cards, inputs
+- `rounded-xl` (16px) - Modales, containers
+- `rounded-2xl` (20px) - Elementos grandes
+
+### Utilidades Personalizadas
+
+```tsx
+/* Gradient text */
+<h1 className="gradient-text">FinanzasApp</h1>
+
+/* Glass effect */
+<div className="glass">Efecto glassmorphism</div>
+
+/* Smooth transitions */
+<div className="transition-smooth hover:scale-105">Hover suave</div>
+```
+
+### Configuración
+- **Tailwind Config**: [tailwind.config.js](tailwind.config.js)
+- **CSS Global**: [src/index.css](src/index.css)
+- Ver archivos para paleta completa y variables CSS personalizadas
 
 ---
 

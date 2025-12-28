@@ -123,7 +123,10 @@ export default function Transactions() {
 
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-6 py-3 bg-primary hover:bg-primary/90 rounded-lg font-semibold transition-colors cursor-pointer"
+          className="px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer text-white"
+          style={{ backgroundColor: '#AA73F3' }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#8B4FE8')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#AA73F3')}
         >
           {showForm ? 'Cancelar' : '+ Nueva Transacción'}
         </button>

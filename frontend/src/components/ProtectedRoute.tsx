@@ -53,7 +53,7 @@ export const ProtectedRoute = ({
         </p>
         <button
           onClick={() => window.history.back()}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
         >
           Volver
         </button>
@@ -74,7 +74,7 @@ export const ProtectedRoute = ({
         </p>
         <button
           onClick={() => window.history.back()}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
         >
           Volver
         </button>

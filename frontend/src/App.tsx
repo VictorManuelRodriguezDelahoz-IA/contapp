@@ -6,6 +6,7 @@ import LayoutDashboard from '@/components/icons/LayoutDashboard';
 import Receipt from '@/components/icons/Receipt';
 import Calculator from '@/components/icons/Calculator';
 import LogOut from '@/components/icons/LogOut';
+import logoImage from '@/assets/logo.jpeg';
 import { useAuth } from '@/hooks/useAuth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
@@ -26,8 +27,11 @@ const queryClient = new QueryClient({
 });
 
 const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+  <div className="flex items-center justify-center min-h-screen bg-surface">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary/20 border-t-primary"></div>
+      <p className="text-sm text-text-secondary">Cargando...</p>
+    </div>
   </div>
 );
 
@@ -35,8 +39,8 @@ function AppContent() {
   const { isAuthenticated, userName, profile, logout, loading } = useAuth();
   const location = useLocation();
 
-  // Mostrar loading mientras se verifica la autenticación
-  if (loading) {
+  // Mostrar loading mientras se verifica la autenticación o se carga el perfil
+  if (loading || (isAuthenticated && !profile)) {
     return <LoadingSpinner />;
   }
 
@@ -61,81 +65,93 @@ function AppContent() {
   // Si la cuenta está desactivada
   if (profile && !profile.is_active) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen p-4">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">Cuenta Desactivada</h1>
-        <p className="text-gray-600 text-center mb-6">
-          Tu cuenta ha sido desactivada por un administrador.
-        </p>
-        <button
-          onClick={logout}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-        >
-          Cerrar Sesión
-        </button>
+      <div className="flex flex-col items-center justify-center h-screen p-4 bg-surface">
+        <div className="card p-8 max-w-md text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-error/10">
+            <svg className="w-8 h-8 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-semibold text-text-primary mb-3">Cuenta Desactivada</h1>
+          <p className="text-text-secondary mb-6">
+            Tu cuenta ha sido desactivada por un administrador. Contacta con soporte para más información.
+          </p>
+          <button
+            onClick={logout}
+            className="btn-primary w-full"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
     );
   }
 
   const isActive = (path: string) => location.pathname === path;
 
+  const getRoleLabel = (role: string) => {
+    const roleMap: Record<string, string> = {
+      'admin': 'Administrador',
+      'full_user': 'Usuario Pro',
+      'partial_user': 'Usuario Básico',
+    };
+    return roleMap[role] || role;
+  };
+
+  const navItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/transactions', label: 'Transacciones', icon: Receipt },
+  ];
+
+  // Add calculator if not partial user
+  if (profile?.role !== 'partial_user') {
+    navItems.push({ path: '/tax-calculator', label: 'Calculadora', icon: Calculator });
+  }
+
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-64 glass border-r border-white/10 flex flex-col">
-        <div className="p-6 border-b border-white/10">
-          <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            FinanzasApp
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">{userName}</p>
-          {profile?.role && (
-            <span className="inline-block mt-2 px-2 py-1 text-xs rounded-full bg-primary/20 text-primary">
-              {profile.role === 'admin' ? 'Administrador' : profile.role === 'full_user' ? 'Usuario Completo' : 'Usuario Básico'}
-            </span>
-          )}
+    <div className="flex h-screen overflow-hidden bg-surface">
+      {/* Sidebar - Apple-inspired */}
+      <aside className="w-72 bg-background-card border-r border-border-light flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b border-border-light">
+          <div className="flex items-center justify-center mb-4">
+            <img src={logoImage} alt="Numerika Consultores" className="h-20 w-auto object-contain" />
+          </div>
+
+          {/* User Info */}
+          <div className="p-3 rounded-xl bg-surface/50 border border-border-light">
+            <p className="text-sm font-medium text-text-primary truncate">{userName}</p>
+            {profile?.role && (
+              <span className="inline-flex items-center mt-1.5 px-2 py-0.5 text-xs font-medium rounded-md bg-primary/10 text-primary">
+                {getRoleLabel(profile.role)}
+              </span>
+            )}
+          </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
-          <Link
-            to="/dashboard"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive('/dashboard')
-              ? 'bg-primary text-white'
-              : 'text-gray-300 hover:bg-white/5'
-              }`}
-          >
-            <LayoutDashboard className="w-5 h-5 flex-shrink-0" />
-            <span>Dashboard</span>
-          </Link>
-
-          <Link
-            to="/transactions"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive('/transactions')
-              ? 'bg-primary text-white'
-              : 'text-gray-300 hover:bg-white/5'
-              }`}
-          >
-            <Receipt className="w-5 h-5 flex-shrink-0" />
-            <span>Transacciones</span>
-          </Link>
-
-          {/* Calculadora - Ocultar para partial_user */}
-          {profile?.role !== 'partial_user' && (
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map(({ path, label, icon: Icon }) => (
             <Link
-              to="/tax-calculator"
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive('/tax-calculator')
-                ? 'bg-primary text-white'
-                : 'text-gray-300 hover:bg-white/5'
-                }`}
+              key={path}
+              to={path}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm transition-all ${
+                isActive(path)
+                  ? 'bg-primary/10 text-primary shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+              }`}
             >
-              <Calculator className="w-5 h-5 flex-shrink-0" />
-              <span>Calculadora</span>
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive(path) ? 'text-primary' : ''}`} />
+              <span>{label}</span>
             </Link>
-          )}
+          ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        {/* Footer */}
+        <div className="p-4 border-t border-border-light">
           <button
             onClick={logout}
-            className="w-full px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full px-4 py-2.5 bg-surface hover:bg-surface-dark border border-border-light text-text-secondary hover:text-error rounded-lg transition-all flex items-center justify-center gap-2 font-medium text-sm cursor-pointer"
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
             <span>Cerrar Sesión</span>
@@ -144,7 +160,7 @@ function AppContent() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto bg-surface">
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
