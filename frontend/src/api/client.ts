@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import { supabase } from '../lib/supabaseClient';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: '/api',
@@ -7,13 +8,15 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add token
+// Request interceptor to add Supabase token
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('token');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config: InternalAxiosRequestConfig) => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.access_token && config.headers) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
     }
+
     return config;
   },
   (error) => {
@@ -24,11 +27,10 @@ apiClient.interceptors.request.use(
 // Response interceptor to handle errors
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      // Clear auth data and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('userName');
+      // Session expired, logout
+      await supabase.auth.signOut();
       window.location.href = '/';
     }
     return Promise.reject(error);

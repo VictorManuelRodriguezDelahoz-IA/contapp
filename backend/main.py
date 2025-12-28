@@ -1,62 +1,44 @@
-from fastapi import FastAPI, Depends, HTTPException
+"""
+FastAPI Backend for FinanzasApp
+Hybrid architecture: Supabase for data + FastAPI for business logic
+"""
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from datetime import timedelta
+import os
+from dotenv import load_dotenv
 
-from .models import (
-    TaxRequest, TaxResponse, ParafiscalesDetail,
-    LoginRequest, LoginResponse
-)
-from .database import get_db, init_db
-from .auth import verify_access_code, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from .models import TaxRequest, TaxResponse, ParafiscalesDetail
 from .financial_routes import router as financial_router
 
+# Load environment variables
+load_dotenv()
+
 # Initialize FastAPI app
-app = FastAPI(title="Gestión Financiera Personal", version="2.0.0")
+app = FastAPI(
+    title="FinanzasApp API",
+    version="3.0.0",
+    description="Financial management API with Supabase backend"
+)
 
 # CORS configuration
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize database on startup
-@app.on_event("startup")
-def startup_event():
-    init_db()
-
-# Include financial routes
+# Include financial routes (all authenticated endpoints)
 app.include_router(financial_router)
 
-# ============ AUTHENTICATION ============
-@app.post("/api/auth/login", response_model=LoginResponse)
-def login(login_data: LoginRequest, db: Session = Depends(get_db)):
-    """Login with access code"""
-    user = verify_access_code(login_data.access_code, db)
-    
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Código de acceso inválido"
-        )
-    
-    # Create access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires
-    )
-    
-    return LoginResponse(
-        access_token=access_token,
-        user_name=user.name
-    )
 
-
-# ============ TAX CALCULATOR (EXISTING FUNCTIONALITY) ============
+# ============================================================================
+# TAX CALCULATOR (PUBLIC ENDPOINT - NO AUTH REQUIRED)
+# ============================================================================
+# This is pure business logic that doesn't require database access
 
 # 2025 Colombian Tax Rates
 INCOME_TAX_BRACKETS_2025 = [
@@ -76,6 +58,7 @@ PARAFISCALES_RATES = {
 # UVT 2025 (Unidad de Valor Tributario)
 UVT_2025 = 47065  # COP
 
+
 def calculate_income_tax_natural(annual_income: float, deductions: float) -> float:
     """Calculate progressive income tax for natural persons (2025 rates)"""
     taxable_income = max(0, annual_income - deductions)
@@ -93,9 +76,11 @@ def calculate_income_tax_natural(annual_income: float, deductions: float) -> flo
     
     return tax
 
+
 def calculate_income_tax_sas(annual_income: float) -> float:
     """Calculate flat income tax for SAS (2025 rate)"""
     return annual_income * SAS_TAX_RATE_2025
+
 
 def calculate_parafiscales(monthly_income: float) -> ParafiscalesDetail:
     """Calculate parafiscales (health, pension, ARL) - monthly basis"""
@@ -110,6 +95,7 @@ def calculate_parafiscales(monthly_income: float) -> ParafiscalesDetail:
         total=round(salud + pension + arl, 2)
     )
 
+
 def calculate_deductions(afc: float, mortgage_interest: float) -> float:
     """Calculate total deductions (AFC + mortgage interest)"""
     # AFC: Max 30% of annual income, up to 3,800 UVT
@@ -122,22 +108,34 @@ def calculate_deductions(afc: float, mortgage_interest: float) -> float:
     
     return afc_deduction + mortgage_deduction
 
+
 @app.get("/")
 async def root():
+    """API Health check and info"""
     return {
-        "message": "Gestión Financiera Personal - API",
-        "version": "2.0.0",
+        "message": "FinanzasApp API - Hybrid Architecture",
+        "version": "3.0.0",
+        "architecture": {
+            "database": "Supabase PostgreSQL",
+            "auth": "Supabase Auth",
+            "backend": "FastAPI (business logic)"
+        },
         "endpoints": {
-            "auth": "/api/auth/login (POST)",
-            "calculate_taxes": "/api/calculate (POST)",
-            "financial": "/api/financial/* (requires authentication)"
+            "health": "/ (GET)",
+            "tax_calculator": "/api/calculate (POST) - No auth required",
+            "financial": "/api/financial/* (requires Bearer token from Supabase)",
+            "docs": "/docs (Swagger UI)",
+            "redoc": "/redoc (ReDoc)"
         }
     }
+
 
 @app.post("/api/calculate", response_model=TaxResponse)
 async def calculate_taxes(request: TaxRequest):
     """
     Calculate Colombian taxes and parafiscales based on user input
+    
+    **PUBLIC ENDPOINT - NO AUTHENTICATION REQUIRED**
     
     - **legal_status**: "natural" (Persona Natural) or "sas" (SAS)
     - **monthly_income**: Monthly income in COP

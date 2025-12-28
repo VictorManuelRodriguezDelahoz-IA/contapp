@@ -7,12 +7,14 @@ import Receipt from '@/components/icons/Receipt';
 import Calculator from '@/components/icons/Calculator';
 import LogOut from '@/components/icons/LogOut';
 import { useAuth } from '@/hooks/useAuth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 // Lazy load components
 const Login = lazy(() => import('@/features/auth/components/Login'));
 const Dashboard = lazy(() => import('@/features/dashboard/components/Dashboard'));
 const Transactions = lazy(() => import('@/features/transactions/components/Transactions'));
 const TaxCalculator = lazy(() => import('@/features/tax-calculator/components/TaxCalculator'));
+const TermsModal = lazy(() => import('@/features/terms/components/TermsModal'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,14 +32,47 @@ const LoadingSpinner = () => (
 );
 
 function AppContent() {
-  const { isAuthenticated, userName, login, logout } = useAuth();
+  const { isAuthenticated, userName, profile, logout, loading } = useAuth();
   const location = useLocation();
 
+  // Mostrar loading mientras se verifica la autenticación
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  // Si no está autenticado, mostrar login
   if (!isAuthenticated) {
     return (
       <Suspense fallback={<LoadingSpinner />}>
-        <Login onLoginSuccess={login} />
+        <Login />
       </Suspense>
+    );
+  }
+
+  // Si está autenticado pero no ha aceptado términos, mostrar modal bloqueante
+  if (isAuthenticated && !profile?.terms_accepted_at) {
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        <TermsModal />
+      </Suspense>
+    );
+  }
+
+  // Si la cuenta está desactivada
+  if (profile && !profile.is_active) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen p-4">
+        <h1 className="text-2xl font-bold text-red-600 mb-4">Cuenta Desactivada</h1>
+        <p className="text-gray-600 text-center mb-6">
+          Tu cuenta ha sido desactivada por un administrador.
+        </p>
+        <button
+          onClick={logout}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+        >
+          Cerrar Sesión
+        </button>
+      </div>
     );
   }
 
@@ -52,6 +87,11 @@ function AppContent() {
             FinanzasApp
           </h1>
           <p className="text-sm text-gray-400 mt-1">{userName}</p>
+          {profile?.role && (
+            <span className="inline-block mt-2 px-2 py-1 text-xs rounded-full bg-primary/20 text-primary">
+              {profile.role === 'admin' ? 'Administrador' : profile.role === 'full_user' ? 'Usuario Completo' : 'Usuario Básico'}
+            </span>
+          )}
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
@@ -77,16 +117,19 @@ function AppContent() {
             <span>Transacciones</span>
           </Link>
 
-          <Link
-            to="/tax-calculator"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive('/tax-calculator')
-              ? 'bg-primary text-white'
-              : 'text-gray-300 hover:bg-white/5'
-              }`}
-          >
-            <Calculator className="w-5 h-5 flex-shrink-0" />
-            <span>Calculadora</span>
-          </Link>
+          {/* Calculadora - Ocultar para partial_user */}
+          {profile?.role !== 'partial_user' && (
+            <Link
+              to="/tax-calculator"
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive('/tax-calculator')
+                ? 'bg-primary text-white'
+                : 'text-gray-300 hover:bg-white/5'
+                }`}
+            >
+              <Calculator className="w-5 h-5 flex-shrink-0" />
+              <span>Calculadora</span>
+            </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-white/10">
@@ -105,9 +148,35 @@ function AppContent() {
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/tax-calculator" element={<TaxCalculator />} />
+
+            {/* Rutas protegidas para todos los usuarios autenticados */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/transactions"
+              element={
+                <ProtectedRoute>
+                  <Transactions />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Calculadora - Bloqueada para partial_user */}
+            <Route
+              path="/tax-calculator"
+              element={
+                <ProtectedRoute requireFullAccess>
+                  <TaxCalculator />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Suspense>
       </main>

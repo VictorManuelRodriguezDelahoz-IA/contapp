@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -62,6 +62,8 @@ class TransactionUpdate(BaseModel):
 
 
 class TransactionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     description: str
     amount: float
@@ -76,20 +78,16 @@ class TransactionResponse(BaseModel):
     notes: Optional[str]
     created_at: datetime
 
-    class Config:
-        orm_mode = True
-
 
 # Category models
 class CategoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     name: str
     type: str
     color: str
     icon: str
-
-    class Config:
-        orm_mode = True
 
 
 # Budget models
@@ -101,6 +99,8 @@ class BudgetCreate(BaseModel):
 
 
 class BudgetResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     category_id: int
     category_name: str
@@ -108,9 +108,6 @@ class BudgetResponse(BaseModel):
     month: int
     year: int
     spent: float = 0
-
-    class Config:
-        orm_mode = True
 
 
 # Savings goal models
@@ -125,6 +122,8 @@ class SavingsGoalUpdate(BaseModel):
 
 
 class SavingsGoalResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     name: str
     target_amount: float
@@ -133,9 +132,6 @@ class SavingsGoalResponse(BaseModel):
     created_at: datetime
     completed: bool
     progress_percentage: float
-
-    class Config:
-        orm_mode = True
 
 
 # Summary models
@@ -162,4 +158,3 @@ class FinancialSummary(BaseModel):
     balance: float
     expense_by_category: List[CategorySummary]
     income_by_category: List[CategorySummary]
-
