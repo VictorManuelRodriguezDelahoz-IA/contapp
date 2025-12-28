@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
 import { supabase } from '../lib/supabaseClient';
 import type { User } from '@supabase/supabase-js';
 
@@ -21,19 +22,19 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Obtener sesión actual
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        await fetchProfile(session.user.id);
       }
       setLoading(false);
     });
 
     // Escuchar cambios de autenticación
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        await fetchProfile(session.user.id);
       } else {
         setProfile(null);
       }
@@ -90,8 +91,17 @@ export const useAuth = () => {
         throw new Error(`Error al aceptar términos: ${error.message}`);
       }
 
-      // Refrescar el perfil para obtener la actualización
-      await fetchProfile(user.id);
+      // Actualización síncrona FORZADA del estado (sin batching)
+      flushSync(() => {
+        setProfile({
+          ...profile!,
+          terms_accepted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+      });
+
+      // Refrescar el perfil desde DB para confirmar (sin await para no bloquear)
+      fetchProfile(user.id);
     } catch (error: any) {
       console.error('Error en acceptTerms:', error);
       throw error;

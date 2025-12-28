@@ -46,15 +46,19 @@ Frontend (React) → Supabase Auth (JWT)
 - ✅ Validación de tokens JWT de Supabase
 - ✅ CRUD completo usando Supabase PostgreSQL
 - ✅ Endpoints de resúmenes y agregaciones
+- ✅ Panel de administración (CRUD de usuarios - solo admins)
+- ✅ Creación de usuarios vía Supabase Auth Admin API
 - ✅ Calculadora de impuestos (sin autenticación)
 - ✅ Entorno virtual Python configurado
 - ✅ Dependencias actualizadas a versiones compatibles
 
 ### 4. Frontend (100%)
 - ✅ Cliente de Supabase integrado
-- ✅ Hook `useAuth` con Supabase Auth
+- ✅ Hook `useAuth` con Supabase Auth y estados optimizados
 - ✅ Componente `ProtectedRoute` con validaciones
-- ✅ Modal de términos implementado
+- ✅ Modal de términos implementado con redirección automática
+- ✅ Panel de administración con gestión completa de usuarios
+- ✅ Hook `useAdminUsers` con React Query para gestión de estado
 - ✅ Variables de entorno configuradas
 - ✅ Restricciones por rol implementadas
 

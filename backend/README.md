@@ -55,6 +55,7 @@ Frontend → Backend (FastAPI) → Supabase (PostgreSQL)
 - ✅ **Verificar permisos** (is_active, terms_accepted, role)
 - ✅ **Lógica de negocio compleja** (agregaciones, cálculos)
 - ✅ **CRUD de datos** (transacciones, presupuestos, metas)
+- ✅ **Gestión de usuarios** (crear, actualizar, eliminar - solo admins)
 - ✅ **Calculadora de impuestos** (sin autenticación)
 
 ---
@@ -66,7 +67,8 @@ backend/
 ├── main.py                 # Entry point + Calculadora de impuestos
 ├── database.py             # Cliente de Supabase
 ├── auth.py                 # Validación de tokens JWT
-├── financial_routes.py     # Endpoints CRUD
+├── financial_routes.py     # Endpoints CRUD financieros
+├── admin_routes.py         # Endpoints de administración de usuarios
 ├── models.py               # Modelos Pydantic V2
 ├── requirements.txt        # Dependencias
 ├── .env                    # Variables de entorno (Supabase)

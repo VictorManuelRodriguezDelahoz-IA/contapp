@@ -56,6 +56,16 @@ npm run dev
 - ✅ Validación de cuenta activa
 - ✅ RLS (Row Level Security) en Supabase
 
+### 👨‍💼 Panel de Administración
+- ✅ Gestión completa de usuarios (CRUD completo)
+- ✅ Crear usuarios con contraseñas temporales
+- ✅ Ver estadísticas del sistema en tiempo real
+- ✅ Activar/desactivar cuentas
+- ✅ Cambiar roles de usuarios (admin, full_user, partial_user)
+- ✅ Eliminar usuarios y todos sus datos asociados
+- ✅ Búsqueda y filtros avanzados por email, nombre, rol y estado
+- ✅ Generador de contraseñas seguras
+
 ---
 
 ## 🏗️ Arquitectura
@@ -127,7 +137,8 @@ contapp/
 │   ├── main.py                # Entry point + Calculadora
 │   ├── database.py            # Cliente Supabase
 │   ├── auth.py                # Validación JWT
-│   ├── financial_routes.py   # Endpoints CRUD
+│   ├── financial_routes.py   # Endpoints CRUD financieros
+│   ├── admin_routes.py        # Endpoints admin (gestión usuarios)
 │   ├── models.py              # Modelos Pydantic
 │   ├── requirements.txt       # Dependencias Python
 │   ├── .env                   # Variables de entorno
@@ -192,6 +203,15 @@ VITE_API_URL=http://localhost:8000
 - `POST /api/financial/savings-goals` - Crear meta de ahorro
 - `GET /api/financial/savings-goals` - Listar metas de ahorro
 - `PUT /api/financial/savings-goals/{id}` - Actualizar meta
+
+### Admin (solo para admins)
+- `POST /api/admin/users` - Crear nuevo usuario
+- `GET /api/admin/users` - Listar todos los usuarios con estadísticas
+- `GET /api/admin/users/{id}` - Ver detalles completos de usuario
+- `PUT /api/admin/users/{id}` - Actualizar usuario (rol, nombre, etc.)
+- `PUT /api/admin/users/{id}/toggle-active` - Activar/desactivar cuenta
+- `DELETE /api/admin/users/{id}` - Eliminar usuario y todos sus datos
+- `GET /api/admin/statistics` - Estadísticas del sistema (usuarios, transacciones, categorías)
 
 **Documentación interactiva:** http://localhost:8000/docs
 

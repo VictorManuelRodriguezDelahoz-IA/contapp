@@ -44,7 +44,8 @@ frontend/
 │   │   ├── dashboard/        # Dashboard principal
 │   │   ├── transactions/     # CRUD de transacciones
 │   │   ├── tax-calculator/   # Calculadora de impuestos
-│   │   └── terms/            # Modal de términos
+│   │   ├── terms/            # Modal de términos
+│   │   └── admin/            # Panel de administración ⭐ NUEVO
 │   │
 │   ├── components/            # Componentes reutilizables
 │   │   ├── icons/            # Iconos SVG
@@ -54,7 +55,8 @@ frontend/
 │   ├── hooks/                 # Hooks personalizados
 │   │   ├── useAuth.ts        # Autenticación
 │   │   ├── useTransactions.ts
-│   │   └── useSummary.ts
+│   │   ├── useSummary.ts
+│   │   └── useAdminUsers.ts  # Gestión de usuarios ⭐ NUEVO
 │   │
 │   ├── lib/                   # Librerías
 │   │   └── supabaseClient.ts # Cliente de Supabase
@@ -158,6 +160,7 @@ Componente: [ProtectedRoute.tsx](src/components/ProtectedRoute.tsx)
 - Maneja routing
 - Muestra sidebar y navegación
 - Oculta calculadora para `partial_user`
+- Muestra administración solo para `admin`
 
 ### [Dashboard.tsx](src/features/dashboard/components/Dashboard.tsx)
 - Muestra resumen financiero
@@ -176,6 +179,14 @@ Componente: [ProtectedRoute.tsx](src/components/ProtectedRoute.tsx)
 - Sin autenticación requerida
 - Dos regímenes: Persona Natural y SAS
 - Cálculo en tiempo real
+
+### [AdminPanel.tsx](src/features/admin/components/AdminPanel.tsx) - **NUEVO**
+- 👨‍💼 Panel de administración (solo para admins)
+- Gestión completa de usuarios del sistema
+- Ver estadísticas globales
+- Activar/desactivar cuentas
+- Cambiar roles de usuarios
+- Eliminar usuarios y sus datos
 
 ---
 
@@ -207,6 +218,32 @@ const { transactions, isLoading, createTransaction, updateTransaction, deleteTra
 ```typescript
 const { summary, isLoading } = useSummary({ month, year })
 ```
+
+### [useAdminUsers.ts](src/hooks/useAdminUsers.ts) - **NUEVO**
+```typescript
+const {
+  users,
+  statistics,
+  createUser,
+  updateUser,
+  toggleUserActive,
+  deleteUser,
+  isCreating,
+  isUpdating,
+  isLoading
+} = useAdminUsers()
+```
+
+**Funciones:**
+- `createUser({ email, password, full_name, role })` - Crear nuevo usuario con contraseña temporal
+- `updateUser({ userId, data })` - Actualizar usuario (rol, nombre, etc.)
+- `toggleUserActive(userId)` - Activar/desactivar cuenta
+- `deleteUser(userId)` - Eliminar usuario y todos sus datos asociados
+
+**Estados:**
+- `users` - Array de todos los usuarios del sistema con estadísticas
+- `statistics` - Estadísticas globales (totales, activos, por rol, transacciones, categorías)
+- `isCreating`, `isUpdating`, `isLoading` - Estados de carga por operación
 
 ---
 
@@ -280,6 +317,14 @@ npm run type-check
    - Ingresar datos
    - Verificar cálculos
    - Probar ambos regímenes
+
+6. **Panel de Administración (solo admin):**
+   - Login como admin
+   - Ir a http://localhost:5173/admin
+   - Ver estadísticas del sistema
+   - Editar rol de un usuario
+   - Activar/desactivar cuenta
+   - Buscar y filtrar usuarios
 
 ---
 
@@ -424,6 +469,93 @@ echo $VITE_API_URL
 **Solución:**
 - Esto es el comportamiento esperado
 - Cambiar role en Supabase: `UPDATE profiles SET role = 'full_user' WHERE email = '...'`
+
+### Panel de administración no aparece
+**Solución:**
+- Solo visible para usuarios con `role = 'admin'`
+- Verificar rol en Supabase: `SELECT role FROM profiles WHERE email = '...'`
+- Cambiar a admin: `UPDATE profiles SET role = 'admin' WHERE email = '...'`
+
+---
+
+## 👨‍💼 Panel de Administración
+
+### Características
+
+El Panel de Administración es una sección exclusiva para usuarios con rol `admin` que permite gestionar todos los usuarios del sistema.
+
+**URL:** `/admin` (http://localhost:5173/admin)
+
+### Funcionalidades
+
+#### 📊 Dashboard de Estadísticas
+- **Total Usuarios**: Cantidad total de usuarios registrados
+- **Usuarios Activos**: Usuarios con cuenta activa
+- **Transacciones**: Total de transacciones en el sistema
+- **Categorías**: Total de categorías disponibles
+
+#### 🔍 Búsqueda y Filtros
+- **Búsqueda**: Por email o nombre completo (tiempo real)
+- **Filtro por Rol**: Admin, Usuario Pro, Usuario Básico
+- **Filtro por Estado**: Todos, Activos, Inactivos
+
+#### 👥 Gestión de Usuarios
+
+**Tabla con columnas:**
+- Usuario (nombre y email)
+- Rol (con badge de color)
+- Estado (activo/inactivo)
+- Cantidad de transacciones
+- Estado de términos aceptados
+- Acciones disponibles
+
+**Acciones:**
+
+1. **✏️ Editar Usuario**
+   - Cambiar rol (admin, full_user, partial_user)
+   - Editar nombre completo
+   - Guardado inmediato
+
+2. **🔄 Activar/Desactivar**
+   - Toggle para cambiar estado de cuenta
+   - Usuarios desactivados no pueden acceder
+   - Protección: no puedes desactivar tu propia cuenta
+
+3. **🗑️ Eliminar Usuario**
+   - Elimina usuario y TODOS sus datos
+   - Incluye: transacciones, presupuestos, metas de ahorro
+   - ⚠️ Acción irreversible (requiere confirmación)
+   - Protección: no puedes eliminar tu propia cuenta
+
+### API Endpoints Utilizados
+
+```typescript
+// Listar usuarios
+GET /api/admin/users
+
+// Ver detalles de usuario
+GET /api/admin/users/:id
+
+// Actualizar usuario
+PUT /api/admin/users/:id
+
+// Toggle activo/inactivo
+PUT /api/admin/users/:id/toggle-active
+
+// Eliminar usuario
+DELETE /api/admin/users/:id
+
+// Estadísticas del sistema
+GET /api/admin/statistics
+```
+
+### Seguridad
+
+- ✅ Solo accesible para usuarios con `role = 'admin'`
+- ✅ Validación en frontend y backend
+- ✅ Protección contra auto-desactivación/eliminación
+- ✅ Confirmación para acciones destructivas
+- ✅ RLS en Supabase respeta permisos de admin
 
 ---
 

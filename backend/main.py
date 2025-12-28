@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from .models import TaxRequest, TaxResponse, ParafiscalesDetail
 from .financial_routes import router as financial_router
+from .admin_routes import router as admin_router
 
 # Load environment variables
 load_dotenv()
@@ -33,6 +34,9 @@ app.add_middleware(
 
 # Include financial routes (all authenticated endpoints)
 app.include_router(financial_router)
+
+# Include admin routes (admin-only endpoints)
+app.include_router(admin_router)
 
 
 # ============================================================================

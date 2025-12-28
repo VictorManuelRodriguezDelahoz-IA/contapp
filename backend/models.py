@@ -158,3 +158,32 @@ class FinancialSummary(BaseModel):
     balance: float
     expense_by_category: List[CategorySummary]
     income_by_category: List[CategorySummary]
+
+
+# Admin models
+class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    email: str
+    full_name: Optional[str] = None
+    role: str
+    is_active: bool
+    terms_accepted_at: Optional[datetime] = None
+    avatar_url: Optional[str] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+    avatar_url: Optional[str] = None
+
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+    full_name: Optional[str] = None
+    role: str = "full_user"

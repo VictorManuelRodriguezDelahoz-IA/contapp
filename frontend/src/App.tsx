@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import LayoutDashboard from '@/components/icons/LayoutDashboard';
 import Receipt from '@/components/icons/Receipt';
 import Calculator from '@/components/icons/Calculator';
+import Users from '@/components/icons/Users';
 import LogOut from '@/components/icons/LogOut';
 import logoImage from '@/assets/logo.jpeg';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +17,7 @@ const Dashboard = lazy(() => import('@/features/dashboard/components/Dashboard')
 const Transactions = lazy(() => import('@/features/transactions/components/Transactions'));
 const TaxCalculator = lazy(() => import('@/features/tax-calculator/components/TaxCalculator'));
 const TermsModal = lazy(() => import('@/features/terms/components/TermsModal'));
+const AdminPanel = lazy(() => import('@/features/admin/components/AdminPanel'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,11 +38,11 @@ const LoadingSpinner = () => (
 );
 
 function AppContent() {
-  const { isAuthenticated, userName, profile, logout, loading } = useAuth();
+  const { isAuthenticated, userName, profile, logout, loading, hasAcceptedTerms } = useAuth();
   const location = useLocation();
 
   // Mostrar loading mientras se verifica la autenticación o se carga el perfil
-  if (loading || (isAuthenticated && !profile)) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
@@ -53,8 +55,13 @@ function AppContent() {
     );
   }
 
+  // Si está autenticado pero el perfil NO está cargado todavía, mostrar loading
+  if (isAuthenticated && !profile) {
+    return <LoadingSpinner />;
+  }
+
   // Si está autenticado pero no ha aceptado términos, mostrar modal bloqueante
-  if (isAuthenticated && !profile?.terms_accepted_at) {
+  if (isAuthenticated && !hasAcceptedTerms) {
     return (
       <Suspense fallback={<LoadingSpinner />}>
         <TermsModal />
@@ -62,7 +69,7 @@ function AppContent() {
     );
   }
 
-  // Si la cuenta está desactivada
+  // Si la cuenta está desactivada (en este punto profile ya está garantizado que existe)
   if (profile && !profile.is_active) {
     return (
       <div className="flex flex-col items-center justify-center h-screen p-4 bg-surface">
@@ -106,6 +113,11 @@ function AppContent() {
   // Add calculator if not partial user
   if (profile?.role !== 'partial_user') {
     navItems.push({ path: '/tax-calculator', label: 'Calculadora', icon: Calculator });
+  }
+
+  // Add admin panel if admin
+  if (profile?.role === 'admin') {
+    navItems.push({ path: '/admin', label: 'Administración', icon: Users });
   }
 
   return (
@@ -190,6 +202,16 @@ function AppContent() {
               element={
                 <ProtectedRoute requireFullAccess>
                   <TaxCalculator />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Panel - Solo para admins */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminPanel />
                 </ProtectedRoute>
               }
             />
